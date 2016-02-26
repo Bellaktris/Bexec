@@ -3,6 +3,7 @@
 "
 " Let's do some settings efirst.
 "
+
 if !exists("bexec_args")
     " Argument string to feed to script when executing
     let bexec_args = ""
@@ -46,13 +47,13 @@ endif
 "
 let s:bexec_outbufname = "-BExec_output-"
 
+let s:script_types = [
+    \ 'php', 'python', 'sh', 'perl', 'ruby', 'm4', 'pike', 'tclsh' ]
+let s:interpreters = { }
+
 "
 " List of interpreters/common scripting language BExec knows about.
 "
-let s:script_types = [
-    \ 'php', 'python', 'sh', 'perl', 'ruby', 'm4',
-    \ 'pike', 'tclsh' ]
-let s:interpreters = { }
 for n in s:script_types
     if has('win32') || has('win64')
         let s:interpreters[n] = n
@@ -71,21 +72,6 @@ if exists("bexec_script_types")
     endfor
 endif
 
-" Custom 'filters',
-" e.g. you can run html pages through lynx, sql files through MySQL, etc.
-let s:filter_types = {
-            \ 'html' : 'lynx --dump',
-            \ 'sql'  : 'mysql -u root <',
-            \ }
-for k in keys(s:filter_types)
-    let s:interpreters[k] = s:filter_types[k]
-endfor
-" Overwrite user's custom filters.
-if exists("bexec_filter_types")
-    for k in keys(g:bexec_filter_types)
-        let s:interpreters[k] = bexec_filter_types[k]
-    endfor
-endif
 
 "
 " Get the first line of the current buffer and check if it's a shebang line
@@ -114,6 +100,14 @@ endfunction
 "
 function! <SID>GetInterpreterFromFiletype()
     let l:type = &filetype
+
+    if exists("g:bexec_filter_types")
+        let s:res = get(g:bexec_filter_types, l:type, -1)
+        if s:res != -1
+            return s:res
+        endif
+    endif
+
     return get(s:interpreters, l:type, -1)
 endfunction
 
