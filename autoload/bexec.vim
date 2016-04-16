@@ -171,7 +171,7 @@ function! <SID>FindOrCreateOutWin(bufName)
     " Find or create a window for the bufName
     if l:outWinNr == -1
         " Create a new window
-        exec {"ver":"vsp", "hor":"sp"}[g:bexec_splitdir]
+        exec {"ver":"topleft vsp", "hor":"sp"}[g:bexec_splitdir]
 
         let l:outWinNr = winnr()
         if l:outBufNr != -1
