@@ -171,7 +171,21 @@ function! <SID>FindOrCreateOutWin(bufName)
     " Find or create a window for the bufName
     if l:outWinNr == -1
         " Create a new window
-        exec {"ver":"topleft vsp", "hor":"sp"}[g:bexec_splitdir]
+        let l:width = 40
+
+        if exists('g:bexec_width_function')
+            execute 'let l:width =' . g:bexec_width_function . '()'
+        endif
+
+        if exists('g:bexec_max_width')
+            let l:width = l:width < g:bexec_max_width
+                \? l:width : g:bexec_max_width
+        endif
+
+        let l:vsplit = g:bexec_always_on_the_right ?
+                    \'topleft ' . l:width . 'vsp' : l:width . 'vsp'
+
+        exec {"ver":l:vsplit, "hor":l:width."sp"}[g:bexec_splitdir]
 
         let l:outWinNr = winnr()
         if l:outBufNr != -1
